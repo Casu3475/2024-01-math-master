@@ -53,7 +53,9 @@ library MathMasters {
                 mstore(0x40, 0xbac65e5b) // `MathMasters__MulWadFailed()`.
                 revert(0x1c, 0x04)
             }
+            // There is a `if` statement in the function that increments the `x` value with `1`. Maybe, the reason for doing that is the result to be rounded up, but this is incorrect.
             if iszero(sub(div(add(z, x), y), 1)) { x := add(x, 1) }
+            // `add(z, x)`: This add `z` and `x`. But `z` is supposed to be the result from the `MathMasters::mulWadUp` function, it is not initialized and therefore its value is `0`. So, this addition is useless.
             z := add(iszero(iszero(mod(mul(x, y), WAD))), div(mul(x, y), WAD))
         }
     }

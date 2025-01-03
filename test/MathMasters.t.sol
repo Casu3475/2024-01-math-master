@@ -58,4 +58,27 @@ contract MathMastersTest is Base_Test {
     function testSqrtFuzzSolmate(uint256 x) public pure {
         assert(MathMasters.sqrt(x) == solmateSqrt(x));
     }
+
+    // imagine that the values of `x` and `y` are both equal to `3e18`. 
+    // The following test function calculates the expected solution and compares it to the solution retrieved from the `MathMasters::mulWadUp` function. 
+    function testMulWadUpCalculation() public {
+        uint256 solution = (3e18 * 3e18) / 1e18;
+        if (solution * 1e18 < 3e18 * 3e18) {
+        solution += 1;
+        }
+        assertEq(MathMasters.mulWadUp(3e18, 3e18), solution);
+    }
+
+    // At the end the result of the function `MathMasters::mulWadUp` with the provided arguments will be incorrect due to the overflow.
+    function testMulWadUpFuzzOverflow(uint256 x, uint256 y) public {
+        // Precondition: x * y > uint256 max
+        // After reviewing the code, I know it will be enough x to be a small number greater than one, therefore x is limited to be lower than 10
+        vm.assume(x > 1 && x < 10);
+        vm.assume(y > type(uint256).max / x);
+        
+        vm.expectRevert();
+        MathMasters.mulWadUp(x, y); 
+    }
+
+
 }
